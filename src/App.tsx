@@ -5,6 +5,7 @@ import Perfil from "./pages/Perfil";
 import EditarPerfil from "./pages/EditarPerfil";
 import Layout from "./components/Layout";
 import Landing from "./pages/Landing";
+import ProyectoDetalle from "./pages/ProyectoDetalle";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/perfil/editar" element={<EditarPerfil />} />
+          <Route path="/proyecto/:id" element={<ProyectoDetalle />} />
           {/* 💡 Cualquier nueva vista que agregues aquí ya tendrá el Sidebar */}
         </Route>
       </Routes>
