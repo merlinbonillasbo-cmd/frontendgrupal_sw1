@@ -89,3 +89,31 @@ export async function eliminarProyecto(id: number) {
     throw error;
   }
 }
+
+// 4. EDITAR PROYECTO (Requiere Token)
+export async function editarProyecto(id: number, nombre: string, descripcion?: string) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ nombre, descripcion }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw { response: { data: errorData } };
+    }
+
+    return await res.json() as Proyecto;
+  } catch (error: any) {
+    console.error("Error al editar proyecto:", error);
+    if (!error.response) {
+      throw { response: { data: { detail: error.message || "Error de conexión" } } };
+    }
+    throw error;
+  }
+}
