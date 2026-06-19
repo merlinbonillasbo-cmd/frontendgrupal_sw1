@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { editarPerfil } from "../services/usuario";
+import { editarPerfil } from "../services/usuario_service";
 import { Link } from "react-router-dom";
 
 export default function EditarPerfil() {

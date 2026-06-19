@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { registrarUsuario } from "../services/usuario";
+import { registrarUsuario } from "../services/auth_service";
 
 export default function Registro() {
   const [form, setForm] = useState({ nombre_completo: "", correo: "", contrasena: "" });

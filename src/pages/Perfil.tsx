@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { verPerfil, type Usuario } from "../services/usuario";
+import { verPerfil, type Usuario } from "../services/usuario_service";
 
 export default function Perfil() {
   const [perfil, setPerfil] = useState<Usuario | null>(null);

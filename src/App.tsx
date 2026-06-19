@@ -3,22 +3,32 @@ import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
 import EditarPerfil from "./pages/EditarPerfil";
+import Proyectos from "./pages/Proyectos";
 import Layout from "./components/Layout";
+import Audios from "./pages/Audios";
+import Resumenes from "./pages/Resumenes";
+import ChatProyecto from "./pages/ChatProyecto";
+import GrafoProyecto from "./pages/GrafoProyecto";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🔓 Vistas Públicas (Totalmente libres del Layout) */}
+        {/* Vistas públicas */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
 
-        {/* 🔒 Vistas Privadas (Todas protegidas globalmente por el Layout) */}
+        {/* Vistas privadas con Layout y Sidebar */}
         <Route element={<Layout />}>
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/perfil/editar" element={<EditarPerfil />} />
-          {/* 💡 Cualquier nueva vista que agregues aquí ya tendrá el Sidebar */}
+          <Route path="/proyectos" element={<Proyectos />} />
+          <Route path="/proyectos/:proyectoId/audios" element={<Audios />} />
+          <Route path="/proyectos/:proyectoId/resumenes" element={<Resumenes />} />
+          <Route path="/proyectos/:proyectoId/chat" element={<ChatProyecto />} />
+          <Route path="/proyectos/:proyectoId/grafo" element={<GrafoProyecto />} />
+          
         </Route>
       </Routes>
     </BrowserRouter>

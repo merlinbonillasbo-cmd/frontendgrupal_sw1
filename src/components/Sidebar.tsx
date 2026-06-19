@@ -5,25 +5,23 @@ export default function Sidebar() {
   const location = useLocation();
 
   const cerrarSesion = () => {
-    localStorage.removeItem("token"); // Limpiamos el token
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
     navigate("/login");
   };
 
-  // Función auxiliar para marcar visualmente el enlace de la página donde estamos parados
-  const linkActivo = (path: string) => 
-    location.pathname === path 
-      ? "bg-primario text-white" 
+  const linkActivo = (path: string) =>
+    location.pathname === path
+      ? "bg-primario text-white"
       : "text-slate-300 hover:bg-slate-800 hover:text-white";
 
   return (
     <aside className="w-64 h-screen bg-slate-900 border-r border-slate-800 flex flex-col justify-between font-sans fixed left-0 top-0">
-      {/* Sección Superior: Logo / Título */}
       <div className="p-6">
         <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primario to-secundario">
           Panel de Control
         </h2>
-        
-        {/* Enlaces de Navegación */}
+
         <nav className="mt-8 space-y-2">
           <Link
             to="/perfil"
@@ -31,16 +29,23 @@ export default function Sidebar() {
           >
             👤 Mi Perfil
           </Link>
+
           <Link
             to="/perfil/editar"
             className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${linkActivo("/perfil/editar")}`}
           >
             ⚙️ Editar Perfil
           </Link>
+
+          <Link
+            to="/proyectos"
+            className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${linkActivo("/proyectos")}`}
+          >
+            📁 Mis Proyectos
+          </Link>
         </nav>
       </div>
 
-      {/* Sección Inferior: Botón Cerrar Sesión */}
       <div className="p-4 border-t border-slate-800">
         <button
           onClick={cerrarSesion}
