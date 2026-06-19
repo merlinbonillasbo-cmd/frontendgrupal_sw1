@@ -4,13 +4,14 @@ import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
 import EditarPerfil from "./pages/EditarPerfil";
 import Layout from "./components/Layout";
+import Landing from "./pages/Landing";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* 🔓 Vistas Públicas (Totalmente libres del Layout) */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
 

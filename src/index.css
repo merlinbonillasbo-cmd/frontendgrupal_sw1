@@ -2,17 +2,19 @@
 
 @theme {
   /* Colores principales de tu marca o proyecto */
-  --color-primario: #1d4ed8;       /* Un azul fuerte */
-  --color-primario-hover: #1e40af; /* Azul más oscuro para estados hover */
-  --color-secundario: #0ea5e9;     /* Un celeste o azul claro */
-  --color-exito: #16a34a;          /* Verde para mensajes de éxito */
-  --color-error: #dc2626;          /* Rojo para mensajes de error */
+  --color-primario: #0284c7;       /* Celeste principal (sky-600) */
+  --color-primario-hover: #0369a1; /* Celeste más oscuro (sky-700) */
+  --color-secundario: #38bdf8;     /* Celeste claro (sky-400) */
+  --color-exito: #10b981;          /* Verde para mensajes de éxito */
+  --color-error: #ef4444;          /* Rojo para mensajes de error */
   
-  /* Puedes agregar lo que quieras, por ejemplo, fuentes o fondos */
-  --color-fondo-oscuro: #0f172a;
+  /* Color de fondo claro */
+  --color-fondo-claro: #f0f9ff;
 }
 
 
 html, body {
-  background-color: var(--color-fondo-oscuro);
+  background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
+  color: #1e293b;
+  min-height: 100vh;
 }

@@ -6,71 +6,124 @@ export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ correo: "", contrasena: "" });
   const [mensaje, setMensaje] = useState("");
+  const [cargando, setCargando] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.correo || !form.contrasena) {
+      setMensaje("⚠️ Por favor completa todos los campos.");
+      return;
+    }
+    setCargando(true);
+    setMensaje("");
     try {
       await login(form.correo, form.contrasena);
-      setMensaje("✅ Login exitoso");
-      navigate("/perfil");
+      setMensaje("✅ ¡Bienvenido! Redirigiendo...");
+      setTimeout(() => {
+        navigate("/perfil");
+      }, 1000);
     } catch (err: any) {
       setMensaje(`❌ Error: ${err.response?.data?.detail || err.message}`);
+    } finally {
+      setCargando(false);
     }
   };
 
   return (
-    /* 🌟 Contenedor padre: Ocupa todo el alto visible, centra horizontal/verticalmente y da un pequeño padding en móviles */
     <div className="flex min-h-screen items-center justify-center p-4">
-      
-      {/* 🌟 Tarjeta de Login: Cambiada a un fondo oscuro sutil (slate-800/900) para no romper con el fondo global */}
-      <div className="w-full max-w-md p-6 bg-slate-900/50 border border-slate-800 rounded-xl shadow-xl backdrop-blur-sm font-sans">
-        <h2 className="text-2xl font-bold text-center text-primario mb-6">Login</h2>
+      {/* Tarjeta de Login Premium - Blanca/Celeste con sombra difuminada */}
+      <div className="w-full max-w-md p-8 bg-white/90 border border-sky-100 rounded-2xl shadow-2xl shadow-sky-900/10 backdrop-blur-md font-sans transition-all duration-300 hover:shadow-sky-900/15">
         
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-          <input
-            name="correo"
-            type="email"
-            placeholder="Correo"
-            onChange={handleChange}
-            /* Agregamos estilos oscuros para el input: bg-slate-800 y texto blanco */
-            className="px-3 py-2 bg-slate-800 border border-slate-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-secundario placeholder-slate-400"
-          />
-          <input
-            name="contrasena"
-            type="password"
-            placeholder="Contraseña"
-            onChange={handleChange}
-            /* Agregamos estilos oscuros para el input: bg-slate-800 y texto blanco */
-            className="px-3 py-2 bg-slate-800 border border-slate-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-secundario placeholder-slate-400"
-          />
-          
+        {/* Cabecera con Icono */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center justify-center w-14 h-14 bg-sky-50 rounded-full mb-3 text-primario shadow-inner">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Iniciar Sesión</h2>
+          <p className="text-slate-500 text-sm mt-1">Accede a tu cuenta personal</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="correo">
+              Correo Electrónico
+            </label>
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              placeholder="ejemplo@correo.com"
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:outline-none focus:bg-white focus:border-primario focus:ring-4 focus:ring-sky-100 transition-all text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="contrasena">
+              Contraseña
+            </label>
+            <input
+              id="contrasena"
+              name="contrasena"
+              type="password"
+              placeholder="••••••••"
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:outline-none focus:bg-white focus:border-primario focus:ring-4 focus:ring-sky-100 transition-all text-sm"
+              required
+            />
+          </div>
+
           <button
             type="submit"
-            className="px-3 py-2 bg-primario text-white font-semibold rounded hover:bg-primario-hover transition-colors shadow-lg shadow-primario/20"
+            disabled={cargando}
+            className={`w-full py-3 px-4 mt-2 bg-primario text-white font-bold rounded-xl shadow-lg shadow-sky-600/10 hover:shadow-sky-600/20 active:scale-[0.98] transition-all text-sm ${
+              cargando ? "opacity-75 cursor-not-allowed" : "hover:bg-primario-hover"
+            }`}
           >
-            Ingresar
+            {cargando ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
-        
-        <p
-          className={`mt-4 text-sm text-center ${
-            mensaje.startsWith("✅") ? "text-exito" : "text-error"
-          }`}
-        >
-          {mensaje}
-        </p>
-        
-        <p className="mt-4 text-center text-sm text-slate-400">
-          ¿No tienes cuenta?{" "}
-          <a href="/registro" className="text-secundario hover:underline font-medium">
-            Regístrate aquí
-          </a>
-        </p>
-      </div>
 
+        {mensaje && (
+          <div
+            className={`mt-5 p-3 rounded-xl text-center text-sm font-medium border ${
+              mensaje.startsWith("✅")
+                ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                : mensaje.startsWith("⚠️")
+                ? "bg-amber-50 border-amber-100 text-amber-700"
+                : "bg-rose-50 border-rose-100 text-rose-700"
+            }`}
+          >
+            {mensaje}
+          </div>
+        )}
+
+        <div className="mt-6 border-t border-slate-100 pt-5 text-center">
+          <p className="text-sm text-slate-500">
+            ¿No tienes una cuenta aún?{" "}
+            <a href="/registro" className="text-primario hover:text-primario-hover font-semibold transition-colors">
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
