@@ -2,18 +2,20 @@
 @import '@xyflow/react/dist/style.css';
 
 @theme {
-  /* Colores principales de tu marca o proyecto */
-  --color-primario: #1d4ed8;       /* Un azul fuerte */
-  --color-primario-hover: #1e40af; /* Azul más oscuro para estados hover */
-  --color-secundario: #0ea5e9;     /* Un celeste o azul claro */
-  --color-exito: #16a34a;          /* Verde para mensajes de éxito */
-  --color-error: #dc2626;          /* Rojo para mensajes de error */
-  
-  /* Puedes agregar lo que quieras, por ejemplo, fuentes o fondos */
-  --color-fondo-oscuro: #0f172a;
+  /* Colores principales del tema celeste y blanco */
+  --color-primario: #0284c7;       /* Celeste principal (sky-600) */
+  --color-primario-hover: #0369a1; /* Celeste oscuro para hover (sky-700) */
+  --color-secundario: #38bdf8;     /* Celeste brillante (sky-400) */
+  --color-celeste-claro: #e0f2fe;  /* Celeste muy claro (sky-100) */
+  --color-celeste-fondo: #f0f9ff;  /* Fondo celeste suave (sky-50) */
+  --color-exito: #16a34a;          /* Verde éxito */
+  --color-error: #dc2626;          /* Rojo error */
 }
 
-
 html, body {
-  background-color: var(--color-fondo-oscuro);
+  background-color: var(--color-celeste-fondo);
+  color: #0f172a; /* Slate 900 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  margin: 0;
+  padding: 0;
 }

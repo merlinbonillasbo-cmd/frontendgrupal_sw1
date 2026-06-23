@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 
 export default function Layout() {
   return (
-    <div className="flex min-h-screen bg-fondo-oscuro text-white">
+    <div className="flex min-h-screen bg-[#f0f9ff] text-slate-800">
       {/* Barra Lateral Fija */}
       <Sidebar />
 

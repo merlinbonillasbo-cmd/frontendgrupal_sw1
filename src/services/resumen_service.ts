@@ -299,3 +299,112 @@ export async function descargarResumen(
     throw error;
   }
 }
+
+export async function generarResumenSeleccion(
+  titulo: string,
+  audioIds: number[],
+  tipoResumen: TipoResumen
+) {
+  try {
+    const res = await fetch(`${RESUMEN_URL}`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        titulo,
+        audio_ids: audioIds,
+        tipo_resumen: tipoResumen,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw { response: { data: errorData } };
+    }
+
+    return (await res.json()) as Resumen;
+  } catch (error: any) {
+    console.error("Error al generar resumen de selección:", error);
+
+    if (!error.response) {
+      throw {
+        response: {
+          data: {
+            detail: error.message || "Error de conexión",
+          },
+        },
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function listarHistorialResumenesUsuario(): Promise<Resumen[]> {
+  try {
+    const res = await fetch(RESUMEN_URL, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw { response: { data: errorData } };
+    }
+
+    return (await res.json()) as Resumen[];
+  } catch (error: any) {
+    console.error("Error al obtener historial de resúmenes del usuario:", error);
+
+    if (!error.response) {
+      throw {
+        response: {
+          data: {
+            detail: error.message || "Error de conexión",
+          },
+        },
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function guardarResumenManual(
+  titulo: string,
+  texto: string,
+  audioIds?: number[]
+): Promise<Resumen> {
+  try {
+    const res = await fetch(`${RESUMEN_URL}/manual`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        titulo,
+        texto,
+        tipo_resumen: "MEDIO",
+        audio_ids: audioIds || [],
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw { response: { data: errorData } };
+    }
+
+    return (await res.json()) as Resumen;
+  } catch (error: any) {
+    console.error("Error al guardar resumen manual:", error);
+
+    if (!error.response) {
+      throw {
+        response: {
+          data: {
+            detail: error.message || "Error de conexión",
+          },
+        },
+      };
+    }
+
+    throw error;
+  }
+}

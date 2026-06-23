@@ -95,14 +95,14 @@ export default function Proyectos() {
   }
 
   return (
-    <section className="min-h-screen bg-slate-950 text-white">
+    <section className="min-h-screen text-slate-800">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <p className="text-sm text-primario font-semibold uppercase tracking-wide">
+          <p className="text-xs font-bold text-[#0284c7] uppercase tracking-wide">
             Gestión de proyectos
           </p>
-          <h1 className="text-3xl font-bold mt-2">Mis proyectos</h1>
-          <p className="text-slate-400 mt-2">
+          <h1 className="text-3xl font-extrabold text-slate-900 mt-1">Mis proyectos</h1>
+          <p className="text-slate-500 text-sm mt-2">
             Organiza tus audios por materias, reuniones, entrevistas o temas.
           </p>
         </div>
@@ -110,14 +110,14 @@ export default function Proyectos() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Formulario */}
           <div className="lg:col-span-1">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
-              <h2 className="text-xl font-semibold mb-4">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-6 shadow-xl shadow-sky-100/50">
+              <h2 className="text-xl font-bold text-slate-800 mb-4">
                 {editandoId ? "Editar proyecto" : "Nuevo proyecto"}
               </h2>
 
               <form onSubmit={guardarProyecto} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label className="block text-xs font-semibold text-slate-600 mb-2">
                     Nombre del proyecto
                   </label>
                   <input
@@ -127,26 +127,26 @@ export default function Proyectos() {
                     required
                     minLength={2}
                     placeholder="Ej: Inteligencia Artificial"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 outline-none focus:border-primario focus:ring-1 focus:ring-primario"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] transition-all text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label className="block text-xs font-semibold text-slate-600 mb-2">
                     Descripción
                   </label>
                   <textarea
                     value={descripcion}
                     onChange={(e) => setDescripcion(e.target.value)}
-                    placeholder="Describe brevemente el contenido del proyecto"
+                    placeholder="Describe brevemente el contenido"
                     rows={4}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 outline-none focus:border-primario focus:ring-1 focus:ring-primario resize-none"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] transition-all text-sm resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-primario hover:bg-primario/90 text-white font-semibold py-3 rounded-lg transition-colors"
+                  className="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-sky-600/10 text-sm"
                 >
                   {editandoId ? "Actualizar proyecto" : "Crear proyecto"}
                 </button>
@@ -155,7 +155,7 @@ export default function Proyectos() {
                   <button
                     type="button"
                     onClick={cancelarEdicion}
-                    className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 rounded-lg transition-colors"
+                    className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold py-3 rounded-xl transition-colors text-sm"
                   >
                     Cancelar edición
                   </button>
@@ -163,13 +163,13 @@ export default function Proyectos() {
               </form>
 
               {mensaje && (
-                <div className="mt-4 bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg text-sm">
+                <div className="mt-4 bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl text-xs font-medium">
                   {mensaje}
                 </div>
               )}
 
               {error && (
-                <div className="mt-4 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
+                <div className="mt-4 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl text-xs font-medium">
                   {error}
                 </div>
               )}
@@ -178,34 +178,34 @@ export default function Proyectos() {
 
           {/* Lista */}
           <div className="lg:col-span-2">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-6 shadow-xl shadow-sky-100/50">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-semibold">Lista de proyectos</h2>
-                  <p className="text-sm text-slate-400 mt-1">
+                  <h2 className="text-xl font-bold text-slate-800">Lista de proyectos</h2>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
                     Total: {proyectos.length}
                   </p>
                 </div>
 
                 <button
                   onClick={cargarProyectos}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 transition-colors"
+                  className="px-4 py-2 rounded-xl bg-white border border-[#e0f2fe] hover:bg-[#e0f2fe]/30 text-xs font-bold text-slate-700 transition-all shadow-sm"
                 >
                   Actualizar
                 </button>
               </div>
 
               {cargando ? (
-                <div className="text-slate-400 py-10 text-center">
+                <div className="text-slate-400 py-10 text-center text-sm animate-pulse">
                   Cargando proyectos...
                 </div>
               ) : proyectos.length === 0 ? (
-                <div className="border border-dashed border-slate-700 rounded-xl p-10 text-center">
+                <div className="border border-dashed border-[#e0f2fe] bg-[#f0f9ff]/50 rounded-2xl p-10 text-center">
                   <div className="text-5xl mb-4">📁</div>
-                  <h3 className="text-lg font-semibold text-slate-200">
+                  <h3 className="text-lg font-bold text-slate-700">
                     No tienes proyectos creados
                   </h3>
-                  <p className="text-slate-400 mt-2">
+                  <p className="text-slate-400 text-xs mt-2">
                     Crea tu primer proyecto para empezar a organizar tus audios.
                   </p>
                 </div>
@@ -214,43 +214,42 @@ export default function Proyectos() {
                   {proyectos.map((proyecto) => (
                     <div
                       key={proyecto.id}
-                      className="bg-slate-950 border border-slate-800 rounded-xl p-5 hover:border-primario/60 transition-colors"
+                      className="bg-[#f0f9ff] border border-[#e0f2fe] rounded-2xl p-5 hover:border-[#0284c7]/50 transition-all hover:scale-[1.01]"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-slate-800 line-clamp-1">
                             {proyecto.nombre}
                           </h3>
-                          <p className="text-sm text-slate-400 mt-2 line-clamp-3">
+                          <p className="text-xs text-slate-500 mt-2 line-clamp-3 leading-relaxed">
                             {proyecto.descripcion || "Sin descripción"}
                           </p>
                         </div>
 
-                        <span className="text-2xl">📂</span>
+                        <span className="text-2xl select-none">📂</span>
                       </div>
 
-                      <p className="text-xs text-slate-500 mt-4">
+                      <p className="text-[10px] font-semibold text-slate-400 mt-4">
                         Creado:{" "}
                         {new Date(proyecto.creado_en).toLocaleString()}
                       </p>
 
                       <div className="flex gap-2 mt-5">
                         <button
-  onClick={() => navigate(`/proyectos/${proyecto.id}/audios`)}
-  className="flex-1 px-3 py-2 rounded-lg bg-primario hover:bg-primario/90 text-sm text-white transition-colors"
->
-  Ver audios
-</button>
+                          onClick={() => navigate(`/proyectos/${proyecto.id}/audios`)}
+                          className="flex-1 px-3 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-xs font-bold text-white transition-all shadow-md shadow-sky-600/10"
+                        >
+                          Ver audios
+                        </button>
                         <button
                           onClick={() => cargarParaEditar(proyecto)}
-                          className="flex-1 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 transition-colors"
+                          className="flex-1 px-3 py-2 rounded-xl bg-white border border-[#e0f2fe] hover:bg-[#e0f2fe]/30 text-xs font-bold text-slate-700 transition-all"
                         >
                           Editar
                         </button>
-
                         <button
                           onClick={() => borrarProyecto(proyecto.id)}
-                          className="flex-1 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-sm text-red-400 transition-colors"
+                          className="flex-1 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100/50 text-xs font-bold text-red-600 border border-red-100 transition-all"
                         >
                           Eliminar
                         </button>

@@ -9,6 +9,13 @@ import Audios from "./pages/Audios";
 import Resumenes from "./pages/Resumenes";
 import ChatProyecto from "./pages/ChatProyecto";
 import GrafoProyecto from "./pages/GrafoProyecto";
+import GrafosGlobales from "./pages/GrafosGlobales";
+import Quizzes from "./pages/Quizzes";
+import Presentaciones from "./pages/Presentaciones";
+import PDFs from "./pages/PDFs";
+import ResumenesGlobales from "./pages/ResumenesGlobales";
+
+
 
 function App() {
   return (
@@ -28,8 +35,14 @@ function App() {
           <Route path="/proyectos/:proyectoId/resumenes" element={<Resumenes />} />
           <Route path="/proyectos/:proyectoId/chat" element={<ChatProyecto />} />
           <Route path="/proyectos/:proyectoId/grafo" element={<GrafoProyecto />} />
-          
+          <Route path="/grafos" element={<GrafosGlobales />} />
+          <Route path="/quizzes" element={<Quizzes />} />
+          <Route path="/presentaciones" element={<Presentaciones />} />
+          <Route path="/pdfs" element={<PDFs />} />
+          <Route path="/resumenes" element={<ResumenesGlobales />} />
         </Route>
+
+
       </Routes>
     </BrowserRouter>
   );

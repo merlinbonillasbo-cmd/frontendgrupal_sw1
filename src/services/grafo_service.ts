@@ -226,3 +226,49 @@ export async function eliminarGrafo(grafoId: number) {
     throw error;
   }
 }
+
+export interface NodoAudioGrafo {
+  id: string;
+  label: string;
+  proyecto: string;
+}
+
+export interface RelacionAudioGrafo {
+  id: string;
+  source: string;
+  target: string;
+  similarity: number;
+}
+
+export interface GrafoAudiosData {
+  nodes: NodoAudioGrafo[];
+  edges: RelacionAudioGrafo[];
+}
+
+export async function obtenerGrafoAudiosComparar(): Promise<GrafoAudiosData> {
+  try {
+    const res = await fetch(`${GRAFO_URL}/audios/comparar`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw { response: { data: errorData } };
+    }
+
+    return (await res.json()) as GrafoAudiosData;
+  } catch (error: any) {
+    console.error("Error al obtener comparación de audios:", error);
+    if (!error.response) {
+      throw {
+        response: {
+          data: {
+            detail: error.message || "Error de conexión",
+          },
+        },
+      };
+    }
+    throw error;
+  }
+}

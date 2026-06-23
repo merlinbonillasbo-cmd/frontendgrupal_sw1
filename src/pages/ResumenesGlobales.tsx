@@ -1,40 +1,42 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  listarProyectos,
+  type Proyecto,
+} from "../services/proyecto_service";
 import {
   descargarResumen,
   listarResumenesProyecto,
   obtenerResumenPorId,
   guardarResumenManual,
+  listarHistorialResumenesUsuario,
+  type Resumen,
 } from "../services/resumen_service";
-
 import {
+  preguntarProyecto,
   listarConversacionesProyecto,
   listarMensajesConversacion,
-  preguntarProyecto,
   eliminarConversacion,
+  type ChatConversacion,
+  type ChatMensaje,
 } from "../services/chat_service";
 
-import type { Resumen } from "../services/resumen_service";
-import type { ChatConversacion, ChatMensaje } from "../services/chat_service";
-
-export default function Resumenes() {
-  const { proyectoId } = useParams();
+export default function ResumenesGlobales() {
   const navigate = useNavigate();
 
-  const idProyecto = Number(proyectoId);
+  // Proyectos
+  const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+  const [proyectoActivoId, setProyectoActivoId] = useState<number | "">("");
 
-  // Estados de Resúmenes
+  // Resúmenes
   const [resumenes, setResumenes] = useState<Resumen[]>([]);
   const [resumenSeleccionado, setResumenSeleccionado] = useState<Resumen | null>(null);
-  const [cargando, setCargando] = useState(false);
-  const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState("");
+  const [cargandoResumenes, setCargandoResumenes] = useState(false);
 
   // Control de Pestañas
   const [activeTab, setActiveTab] = useState<"documento" | "chat">("documento");
 
-  // Estados de Chat RAG
+  // Chat RAG
   const [conversaciones, setConversaciones] = useState<ChatConversacion[]>([]);
   const [conversacionActiva, setConversacionActiva] = useState<ChatConversacion | null>(null);
   const [mensajes, setMensajes] = useState<ChatMensaje[]>([]);
@@ -43,91 +45,107 @@ export default function Resumenes() {
   const [enviando, setEnviando] = useState(false);
   const [isListening, setIsListening] = useState(false);
 
-  // Cargar lista de resúmenes del proyecto
-  async function cargarResumenes() {
-    try {
-      setCargando(true);
-      setError("");
-      const data = await listarResumenesProyecto(idProyecto);
-      setResumenes(data);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al cargar resúmenes");
-    } finally {
-      setCargando(false);
-    }
-  }
-
-  // Cargar lista de conversaciones del proyecto
-  async function cargarConversaciones() {
-    try {
-      const data = await listarConversacionesProyecto(idProyecto);
-      setConversaciones(data);
-    } catch (err: any) {
-      console.error("Error al cargar conversaciones:", err);
-    }
-  }
-
-  // Cargar mensajes de una conversación
-  async function cargarMensajes(conversacion: ChatConversacion) {
-    try {
-      setCargandoChat(true);
-      setError("");
-      setConversacionActiva(conversacion);
-      const data = await listarMensajesConversacion(conversacion.id);
-      setMensajes(data);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al cargar mensajes del chat");
-    } finally {
-      setCargandoChat(false);
-    }
-  }
+  // Feedback
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
-    if (!idProyecto) {
-      navigate("/proyectos");
-      return;
-    }
-    cargarResumenes();
-    cargarConversaciones();
-  }, [idProyecto]);
+    cargarProyectosYHistorial();
+  }, []);
 
-  // Ver detalle de un resumen guardado
+  // Carga inicial
+  async function cargarProyectosYHistorial() {
+    try {
+      const dataProyectos = await listarProyectos();
+      setProyectos(dataProyectos);
+    } catch (err) {
+      console.error("Error al cargar proyectos:", err);
+    }
+    cargarHistorialGlobal();
+  }
+
+  // Carga global de todos los resúmenes de todos los proyectos
+  async function cargarHistorialGlobal() {
+    try {
+      setCargandoResumenes(true);
+      setErrorMsg("");
+      const data = await listarHistorialResumenesUsuario();
+      setResumenes(data);
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.detail || "Error al cargar el historial global.");
+    } finally {
+      setCargandoResumenes(false);
+    }
+  }
+
+  // Al seleccionar un proyecto específico
+  async function handleSelectProyecto(pId: number | "") {
+    setProyectoActivoId(pId);
+    setConversacionActiva(null);
+    setMensajes([]);
+    
+    if (pId === "") {
+      // Cargar global
+      cargarHistorialGlobal();
+      setConversaciones([]);
+    } else {
+      // Cargar filtrado
+      try {
+        setCargandoResumenes(true);
+        const dataResumenes = await listarResumenesProyecto(pId);
+        setResumenes(dataResumenes);
+        
+        const dataConvs = await listarConversacionesProyecto(pId);
+        setConversaciones(dataConvs);
+      } catch (err: any) {
+        setErrorMsg(err.response?.data?.detail || "Error al cargar datos del proyecto.");
+      } finally {
+        setCargandoResumenes(false);
+      }
+    }
+  }
+
+  // Seleccionar y ver detalle de resumen
   async function verDetalle(resumenId: number) {
     try {
-      setError("");
-      setMensaje("");
+      setErrorMsg("");
+      setSuccessMsg("");
       const data = await obtenerResumenPorId(resumenId);
       setResumenSeleccionado(data);
-      setActiveTab("documento"); // Cambiar a pestaña documento al seleccionar
+      setActiveTab("documento");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al obtener resumen");
+      setErrorMsg(err.response?.data?.detail || "Error al obtener detalle del resumen.");
     }
   }
 
-  // Descargar resumen en un formato
+  // Descargar resumen
   async function descargar(resumenId: number, formato: "txt" | "pdf" | "docx") {
     try {
-      setError("");
-      setMensaje("");
+      setErrorMsg("");
+      setSuccessMsg("");
       await descargarResumen(resumenId, formato);
-      setMensaje(`Resumen descargado en formato ${formato.toUpperCase()}`);
+      setSuccessMsg(`Resumen descargado en formato ${formato.toUpperCase()}`);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al descargar resumen");
+      setErrorMsg(err.response?.data?.detail || "Error al descargar resumen");
     }
   }
 
-  // Enviar pregunta al chat RAG
+  // Enviar consulta en el chat RAG
   async function enviarPregunta(e?: React.FormEvent) {
     if (e) e.preventDefault();
+    if (!proyectoActivoId) {
+      setErrorMsg("Por favor, selecciona un proyecto para chatear.");
+      return;
+    }
     if (!pregunta.trim()) return;
 
     try {
       setEnviando(true);
-      setError("");
-      setMensaje("");
+      setErrorMsg("");
+      setSuccessMsg("");
 
       const data = await preguntarProyecto(
-        idProyecto,
+        Number(proyectoActivoId),
         pregunta,
         conversacionActiva?.id || null
       );
@@ -135,20 +153,23 @@ export default function Resumenes() {
       setConversacionActiva(data.conversacion);
       setMensajes((prev) => [...prev, data.pregunta, data.respuesta]);
       setPregunta("");
-      await cargarConversaciones();
+      
+      // Recargar conversaciones
+      const dataConvs = await listarConversacionesProyecto(Number(proyectoActivoId));
+      setConversaciones(dataConvs);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al enviar la consulta al chat");
+      setErrorMsg(err.response?.data?.detail || "Error al chatear con el RAG.");
     } finally {
       setEnviando(false);
     }
   }
 
-  // Dictado por micrófono usando SpeechRecognition de HTML5
+  // Dictado por micrófono nativo
   function startListening() {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setError("Tu navegador de internet no tiene soporte de micrófono nativo.");
+      setErrorMsg("Tu navegador no soporta entrada de voz por micrófono.");
       return;
     }
 
@@ -167,7 +188,7 @@ export default function Resumenes() {
     };
 
     recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
+      console.error(event.error);
       setIsListening(false);
     };
 
@@ -178,144 +199,171 @@ export default function Resumenes() {
     recognition.start();
   }
 
-  // Guardar un texto de la IA como un resumen académico oficial
+  // Guardar un texto del chat como un resumen de estudio formal
   async function guardarComoResumen(texto: string) {
     const titulo = prompt(
-      "Ingresa el título para guardar este resumen de estudio:",
+      "Ingresa el título de tu nuevo resumen académico:",
       `Resumen de Chat - ${new Date().toLocaleDateString()}`
     );
 
     if (!titulo || !titulo.trim()) return;
 
     try {
-      setError("");
-      setMensaje("");
+      setErrorMsg("");
+      setSuccessMsg("");
       const nuevoResumen = await guardarResumenManual(titulo, texto, []);
       
-      // Recargar lista e indicar éxito
-      await cargarResumenes();
+      // Recargar resúmenes
+      if (proyectoActivoId === "") {
+        await cargarHistorialGlobal();
+      } else {
+        const dataResumenes = await listarResumenesProyecto(Number(proyectoActivoId));
+        setResumenes(dataResumenes);
+      }
+
       setResumenSeleccionado(nuevoResumen);
-      setMensaje("¡Resumen del chat guardado exitosamente en el historial!");
-      
-      // Mover a la pestaña de visualización
+      setSuccessMsg("¡Resumen del chat guardado exitosamente en el historial!");
       setActiveTab("documento");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al guardar el resumen en la base de datos.");
+      setErrorMsg(err.response?.data?.detail || "Error al guardar el resumen.");
     }
   }
 
-  // Nueva conversación de chat
-  function nuevaConversacion() {
-    setConversacionActiva(null);
-    setMensajes([]);
-    setPregunta("");
-    setError("");
-    setMensaje("Nueva sesión de chat iniciada.");
+  // Cargar mensajes de una conversación
+  async function cargarMensajesChat(conv: ChatConversacion) {
+    try {
+      setCargandoChat(true);
+      setErrorMsg("");
+      setConversacionActiva(conv);
+      const data = await listarMensajesConversacion(conv.id);
+      setMensajes(data);
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.detail || "Error al cargar mensajes del chat.");
+    } finally {
+      setCargandoChat(false);
+    }
   }
 
-  // Eliminar conversación del historial
+  // Eliminar conversación
   async function borrarConversacion(conversacionId: number) {
-    if (!confirm("¿Deseas eliminar permanentemente esta conversación?")) return;
+    if (!confirm("¿Seguro que deseas eliminar esta conversación?")) return;
     try {
-      setError("");
-      setMensaje("");
+      setErrorMsg("");
       await eliminarConversacion(conversacionId);
       if (conversacionActiva?.id === conversacionId) {
         setConversacionActiva(null);
         setMensajes([]);
       }
-      setMensaje("Conversación eliminada.");
-      await cargarConversaciones();
+      setSuccessMsg("Conversación eliminada.");
+      if (proyectoActivoId !== "") {
+        const dataConvs = await listarConversacionesProyecto(Number(proyectoActivoId));
+        setConversaciones(dataConvs);
+      }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al eliminar la conversación.");
+      setErrorMsg(err.response?.data?.detail || "Error al eliminar conversación.");
     }
   }
 
   return (
-    <section className="min-h-screen text-slate-800 font-sans p-6 bg-slate-50/50">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 p-6 font-sans">
+      <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Cabecera superior */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Cabecera Principal */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-5 gap-4">
           <div>
-            <button
-              onClick={() => navigate(`/proyectos/${idProyecto}/audios`)}
-              className="text-xs font-bold text-slate-400 hover:text-[#0284c7] transition-all flex items-center space-x-1 mb-2"
-            >
-              <span>←</span> <span>Volver a audios del proyecto</span>
-            </button>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-              Centro de Resúmenes e IA RAG
+            <span className="text-[10px] font-black tracking-wider text-[#0284c7] bg-[#e0f2fe] px-2.5 py-1 rounded-full uppercase">
+              Consola Interactiva
+            </span>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight mt-2">
+              Resúmenes Globales y Chat RAG
             </h1>
-            <p className="text-slate-500 text-xs mt-1">
-              Consulta documentos generados o chatea con la IA usando el contenido transcrito del proyecto.
+            <p className="text-slate-500 text-sm mt-1">
+              Consulta tu historial unificado de resúmenes de estudio o conversa con tus clases mediante Ollama.
             </p>
+          </div>
+
+          {/* Selector de Proyecto */}
+          <div className="flex items-center space-x-2">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+              Proyecto:
+            </label>
+            <select
+              value={proyectoActivoId}
+              onChange={(e) => {
+                const val = e.target.value;
+                handleSelectProyecto(val === "" ? "" : Number(val));
+              }}
+              className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#0284c7]"
+            >
+              <option value="">-- Todos los Proyectos --</option>
+              {proyectos.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nombre}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         {/* Notificaciones */}
-        {mensaje && (
-          <div className="mb-4 bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 rounded-2xl text-xs font-semibold shadow-sm">
-            {mensaje}
+        {successMsg && (
+          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3.5 rounded-2xl text-xs font-semibold flex items-center space-x-2 shadow-sm animate-fade-in">
+            <span>✨</span>
+            <span>{successMsg}</span>
           </div>
         )}
-
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-2xl text-xs font-semibold shadow-sm">
-            {error}
+        {errorMsg && (
+          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3.5 rounded-2xl text-xs font-semibold flex items-center space-x-2 shadow-sm">
+            <span>⚠️</span>
+            <span>{errorMsg}</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* Barra Lateral Izquierda: Historial de Resúmenes */}
+          {/* Panel Izquierdo: Resúmenes */}
           <div className="lg:col-span-3">
-            <div className="bg-white border border-[#e0f2fe] rounded-3xl p-5 shadow-xl shadow-sky-600/5 space-y-4">
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xl shadow-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-black text-slate-800">Resúmenes Guardados</h2>
-                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">
-                    Total: {resumenes.length}
-                  </p>
-                </div>
-                <button
-                  onClick={cargarResumenes}
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-[10px] font-black text-slate-600 transition-all border border-slate-100"
-                >
-                  🔄
-                </button>
+                <h2 className="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                  <span>📄</span>
+                  <span>Historial de Resúmenes</span>
+                </h2>
+                <span className="text-[10px] bg-[#f0f9ff] text-[#0284c7] font-bold px-2 py-0.5 rounded-full">
+                  {resumenes.length}
+                </span>
               </div>
 
-              {cargando ? (
-                <div className="text-slate-400 py-12 text-center text-xs font-bold animate-pulse">
+              {cargandoResumenes ? (
+                <div className="text-slate-400 py-16 text-center text-xs font-bold animate-pulse">
                   Cargando documentos...
                 </div>
               ) : resumenes.length === 0 ? (
-                <div className="border border-dashed border-slate-200 bg-[#f0f9ff]/20 rounded-2xl p-6 text-center">
+                <div className="border border-dashed border-slate-200 bg-[#f0f9ff]/20 rounded-2xl p-8 text-center">
                   <div className="text-4xl mb-2">📄</div>
-                  <h3 className="text-xs font-black text-slate-700">Sin Resúmenes</h3>
+                  <h3 className="text-xs font-bold text-slate-700">Sin Reportes</h3>
                   <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                    Genera resúmenes desde audios o guarda una respuesta del chat.
+                    No hay resúmenes generados para esta selección.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                  {resumenes.map((resumen) => (
+                  {resumenes.map((item) => (
                     <button
-                      key={resumen.id}
-                      onClick={() => verDetalle(resumen.id)}
+                      key={item.id}
+                      onClick={() => verDetalle(item.id)}
                       className={`w-full text-left bg-slate-50 border rounded-xl p-3.5 transition-all hover:scale-[1.01] ${
-                        resumenSeleccionado?.id === resumen.id
+                        resumenSeleccionado?.id === item.id
                           ? "border-[#0284c7] bg-[#f0f9ff] ring-2 ring-[#0284c7]/10"
                           : "border-slate-100 hover:border-slate-200"
                       }`}
                     >
                       <h3 className="text-xs font-bold text-slate-800 line-clamp-1">
-                        {resumen.titulo || "Resumen generado"}
+                        {item.titulo || "Resumen generado"}
                       </h3>
                       <div className="flex items-center justify-between mt-2 text-[9px] text-slate-400 font-semibold">
-                        <span>Tipo: {resumen.tipo_resumen}</span>
-                        <span>{new Date(resumen.creado_en).toLocaleDateString()}</span>
+                        <span>Tipo: {item.tipo_resumen}</span>
+                        <span>{new Date(item.creado_en).toLocaleDateString()}</span>
                       </div>
                     </button>
                   ))}
@@ -324,7 +372,7 @@ export default function Resumenes() {
             </div>
           </div>
 
-          {/* Panel Principal Derecho: Pestañas */}
+          {/* Panel Derecho: Pestañas */}
           <div className="lg:col-span-9 space-y-4">
             
             {/* Navegación de Pestañas */}
@@ -340,8 +388,16 @@ export default function Resumenes() {
                 📄 Resumen Académico
               </button>
               <button
-                onClick={() => setActiveTab("chat")}
+                onClick={() => {
+                  if (!proyectoActivoId) {
+                    setErrorMsg("Para chatear, primero debes seleccionar un Proyecto específico arriba a la derecha.");
+                    return;
+                  }
+                  setActiveTab("chat");
+                }}
                 className={`flex-1 py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  !proyectoActivoId ? "opacity-50 cursor-not-allowed" : ""
+                } ${
                   activeTab === "chat"
                     ? "bg-[#0284c7] text-white shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
@@ -352,7 +408,7 @@ export default function Resumenes() {
             </div>
 
             {/* Contenido de Pestañas */}
-            <div className="bg-white border border-[#e0f2fe] rounded-3xl p-6 shadow-xl shadow-sky-600/5">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-100">
               
               {activeTab === "documento" ? (
                 /* VISTA DE DOCUMENTO ACADÉMICO */
@@ -366,7 +422,7 @@ export default function Resumenes() {
                         Selecciona un resumen del historial
                       </h3>
                       <p className="text-slate-400 text-xs">
-                        Haz clic en cualquiera de los resúmenes guardados a la izquierda para cargarlo como reporte de papel y descargarlo en formato PDF formal.
+                        Haz clic en cualquiera de los resúmenes guardados a la izquierda para cargarlo en la hoja física de papel y descargarlo en formato académico formal.
                       </p>
                     </div>
                   </div>
@@ -442,10 +498,14 @@ export default function Resumenes() {
                 /* CHAT CON VOZ INTEGRADO */
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[500px]">
                   
-                  {/* Historial de chats (Columna pequeña) */}
+                  {/* Historial de chats del proyecto */}
                   <div className="md:col-span-3 border-r border-slate-100 pr-4 space-y-3">
                     <button
-                      onClick={nuevaConversacion}
+                      onClick={() => {
+                        setConversacionActiva(null);
+                        setMensajes([]);
+                        setPregunta("");
+                      }}
                       className="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-2.5 rounded-xl transition-all text-xs flex items-center justify-center space-x-1"
                     >
                       <span>➕</span>
@@ -462,7 +522,7 @@ export default function Resumenes() {
                               : "bg-slate-50 border-slate-100"
                           }`}
                         >
-                          <div onClick={() => cargarMensajes(conv)}>
+                          <div onClick={() => cargarMensajesChat(conv)}>
                             <p className="text-xs font-bold text-slate-700 truncate">
                               {conv.titulo || "Conversación"}
                             </p>
@@ -595,6 +655,6 @@ export default function Resumenes() {
         </div>
 
       </div>
-    </section>
+    </div>
   );
 }

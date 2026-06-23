@@ -26,23 +26,23 @@ import type {
 } from "../services/grafo_service";
 
 const tipoColor: Record<TipoNodoGrafo, string> = {
-  TEMA: "#22c55e",
-  SUBTEMA: "#38bdf8",
-  CONCEPTO: "#6366f1",
-  PERSONA: "#f59e0b",
-  TAREA: "#ec4899",
-  DECISION: "#ef4444",
-  RECURSO: "#14b8a6",
+  TEMA: "#16a34a",      // green-600
+  SUBTEMA: "#0284c7",   // sky-600
+  CONCEPTO: "#4f46e5",  // indigo-600
+  PERSONA: "#ca8a04",   // yellow-600
+  TAREA: "#db2777",     // pink-600
+  DECISION: "#dc2626",  // red-600
+  RECURSO: "#0d9488",   // teal-600
 };
 
 const tipoClase: Record<TipoNodoGrafo, string> = {
-  TEMA: "border-green-400 text-green-300 bg-green-500/10",
-  SUBTEMA: "border-sky-400 text-sky-300 bg-sky-500/10",
-  CONCEPTO: "border-indigo-400 text-indigo-300 bg-indigo-500/10",
-  PERSONA: "border-yellow-400 text-yellow-300 bg-yellow-500/10",
-  TAREA: "border-pink-400 text-pink-300 bg-pink-500/10",
-  DECISION: "border-red-400 text-red-300 bg-red-500/10",
-  RECURSO: "border-teal-400 text-teal-300 bg-teal-500/10",
+  TEMA: "border-green-200 text-green-700 bg-green-50",
+  SUBTEMA: "border-sky-200 text-sky-700 bg-sky-50",
+  CONCEPTO: "border-indigo-200 text-indigo-700 bg-indigo-50",
+  PERSONA: "border-yellow-200 text-yellow-700 bg-yellow-50",
+  TAREA: "border-pink-200 text-pink-700 bg-pink-50",
+  DECISION: "border-red-200 text-red-700 bg-red-50",
+  RECURSO: "border-teal-200 text-teal-700 bg-teal-50",
 };
 
 function calcularPosicion(index: number, total: number, importancia: number) {
@@ -78,14 +78,16 @@ function convertirAGrafoReactFlow(grafo: Grafo, filtroTipo: string) {
         nodo,
       },
       style: {
-        border: `2px solid ${tipoColor[nodo.tipo] || "#64748b"}`,
-        background: "#020617",
-        color: "#f8fafc",
+        border: `2px solid ${tipoColor[nodo.tipo] || "#94a3b8"}`,
+        background: "#ffffff",
+        color: "#0f172a",
         borderRadius: 18,
         padding: 12,
         minWidth: 150,
-        boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+        boxShadow: "0 10px 25px -5px rgba(2, 132, 199, 0.1), 0 8px 10px -6px rgba(2, 132, 199, 0.1)",
         fontSize: 13,
+        fontWeight: "600",
+        textAlign: "center",
       },
     };
   });
@@ -99,11 +101,14 @@ function convertirAGrafoReactFlow(grafo: Grafo, filtroTipo: string) {
       label: rel.label,
       animated: rel.peso >= 4,
       style: {
-        strokeWidth: Math.max(1, rel.peso),
+        strokeWidth: Math.max(1.5, rel.peso * 0.8),
+        stroke: "#bae6fd",
       },
       labelStyle: {
-        fill: "#cbd5e1",
+        fill: "#0369a1",
         fontSize: 11,
+        fontWeight: "600",
+        background: "#ffffff",
       },
     }));
 
@@ -137,25 +142,25 @@ export default function GrafoProyecto() {
     }
   }
 
-async function cargarUltimoGrafo() {
-  try {
-    setCargando(true);
-    setError("");
+  async function cargarUltimoGrafo() {
+    try {
+      setCargando(true);
+      setError("");
 
-    const data = await obtenerUltimoGrafoProyecto(idProyecto);
+      const data = await obtenerUltimoGrafoProyecto(idProyecto);
 
-    if (data) {
-      setGrafo(data);
-    } else {
+      if (data) {
+        setGrafo(data);
+      } else {
+        setGrafo(null);
+      }
+    } catch (err: any) {
       setGrafo(null);
+      setError(err.response?.data?.detail || "Error al cargar el grafo");
+    } finally {
+      setCargando(false);
     }
-  } catch (err: any) {
-    setGrafo(null);
-    setError(err.response?.data?.detail || "Error al cargar el grafo");
-  } finally {
-    setCargando(false);
   }
-}
 
   useEffect(() => {
     if (!idProyecto) {
@@ -238,56 +243,57 @@ async function cargarUltimoGrafo() {
   }, [grafo]);
 
   return (
-    <section className="min-h-screen bg-slate-950 text-white">
+    <section className="min-h-screen text-slate-800 font-sans">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <button
             onClick={() => navigate(`/proyectos/${idProyecto}/audios`)}
-            className="mb-4 text-sm text-slate-400 hover:text-white transition-colors"
+            className="mb-4 text-sm font-semibold text-slate-500 hover:text-[#0284c7] transition-all"
           >
             ← Volver a audios
           </button>
 
-          <p className="text-sm text-primario font-semibold uppercase tracking-wide">
+          <p className="text-xs font-bold text-[#0284c7] uppercase tracking-wide">
             Grafo de conocimiento
           </p>
 
-          <h1 className="text-3xl font-bold mt-2">
+          <h1 className="text-3xl font-extrabold text-slate-900 mt-1">
             Mapa interactivo de conceptos
           </h1>
 
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-500 text-sm mt-2">
             Visualiza temas, conceptos, tareas, decisiones y relaciones detectadas en los audios del proyecto.
           </p>
         </div>
 
         {mensaje && (
-          <div className="mb-4 bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg text-sm">
+          <div className="mb-4 bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl text-xs font-medium">
             {mensaje}
           </div>
         )}
 
         {error && (
-          <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
+          <div className="mb-4 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl text-xs font-medium">
             {error}
           </div>
         )}
 
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+          {/* Panel Lateral Izquierdo */}
           <aside className="xl:col-span-1 space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">
                 Generación
               </h2>
 
-              <label className="block text-sm text-slate-300 mb-2">
+              <label className="block text-xs font-semibold text-slate-600 mb-2">
                 Nivel de detalle
               </label>
 
               <select
                 value={nivelDetalle}
                 onChange={(e) => setNivelDetalle(e.target.value as NivelDetalleGrafo)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-primario"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 text-sm outline-none focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] transition-all"
               >
                 <option value="BASICO">Básico</option>
                 <option value="MEDIO">Medio</option>
@@ -297,14 +303,14 @@ async function cargarUltimoGrafo() {
               <button
                 onClick={generarGrafo}
                 disabled={generando}
-                className="w-full mt-4 bg-primario hover:bg-primario/90 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition-colors"
+                className="w-full mt-4 bg-[#0284c7] hover:bg-[#0369a1] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-sky-600/10 text-sm"
               >
                 {generando ? "Generando grafo..." : "Generar grafo"}
               </button>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">
                 Filtros
               </h2>
 
@@ -314,7 +320,7 @@ async function cargarUltimoGrafo() {
                   setFiltroTipo(e.target.value);
                   setNodoSeleccionado(null);
                 }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-primario"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 text-sm outline-none focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] transition-all"
               >
                 <option value="TODOS">Todos los nodos</option>
                 {tiposDisponibles.map((tipo) => (
@@ -326,26 +332,26 @@ async function cargarUltimoGrafo() {
 
               {grafo && (
                 <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-3">
-                    <p className="text-slate-500">Nodos</p>
-                    <p className="text-xl font-bold">{grafo.contenido.nodos.length}</p>
+                  <div className="bg-[#f0f9ff] border border-[#e0f2fe] rounded-xl p-3">
+                    <p className="text-slate-400 font-semibold">Nodos</p>
+                    <p className="text-xl font-bold text-slate-800">{grafo.contenido.nodos.length}</p>
                   </div>
 
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-3">
-                    <p className="text-slate-500">Relaciones</p>
-                    <p className="text-xl font-bold">{grafo.contenido.relaciones.length}</p>
+                  <div className="bg-[#f0f9ff] border border-[#e0f2fe] rounded-xl p-3">
+                    <p className="text-slate-400 font-semibold">Relaciones</p>
+                    <p className="text-xl font-bold text-slate-800">{grafo.contenido.relaciones.length}</p>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">
                 Historial
               </h2>
 
               {historial.length === 0 ? (
-                <p className="text-sm text-slate-400">
+                <p className="text-xs text-slate-400 font-medium">
                   Todavía no hay grafos guardados.
                 </p>
               ) : (
@@ -353,28 +359,28 @@ async function cargarUltimoGrafo() {
                   {historial.map((item) => (
                     <div
                       key={item.id}
-                      className={`border rounded-xl p-3 ${
+                      className={`border rounded-xl p-3 bg-[#f0f9ff] transition-all hover:scale-[1.01] ${
                         grafo?.id === item.id
-                          ? "border-primario bg-slate-950"
-                          : "border-slate-800 bg-slate-950"
+                          ? "border-[#0284c7] ring-2 ring-[#0284c7]/20"
+                          : "border-[#e0f2fe]"
                       }`}
                     >
                       <button
                         onClick={() => abrirGrafo(item.id)}
-                        className="w-full text-left"
+                        className="w-full text-left outline-none"
                       >
-                        <p className="text-sm font-medium line-clamp-1">
+                        <p className="text-sm font-bold text-slate-800 line-clamp-1">
                           {item.titulo || "Grafo generado"}
                         </p>
 
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-[10px] text-slate-400 font-semibold mt-1">
                           {new Date(item.creado_en).toLocaleString()}
                         </p>
                       </button>
 
                       <button
                         onClick={() => borrarGrafo(item.id)}
-                        className="mt-2 text-xs text-red-400 hover:text-red-300"
+                        className="mt-2 text-xs font-bold text-red-600 hover:text-red-700 transition-colors"
                       >
                         Eliminar
                       </button>
@@ -385,33 +391,34 @@ async function cargarUltimoGrafo() {
             </div>
           </aside>
 
+          {/* Canvas de ReactFlow */}
           <main className="xl:col-span-3">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
-              <div className="border-b border-slate-800 p-5">
-                <h2 className="text-xl font-semibold">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl shadow-xl shadow-sky-100/50 overflow-hidden">
+              <div className="border-b border-[#e0f2fe] p-5">
+                <h2 className="text-xl font-bold text-slate-800">
                   {grafo?.titulo || "Grafo del proyecto"}
                 </h2>
 
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {grafo?.descripcion || "Genera un grafo para visualizar las relaciones de conocimiento."}
                 </p>
               </div>
 
-              <div className="h-[680px] bg-slate-950">
+              <div className="h-[680px] bg-[#f8fafc] relative">
                 {cargando ? (
-                  <div className="h-full flex items-center justify-center text-slate-400">
+                  <div className="h-full flex items-center justify-center text-slate-400 text-sm animate-pulse">
                     Cargando grafo...
                   </div>
                 ) : !grafo ? (
                   <div className="h-full flex items-center justify-center">
-                    <div className="border border-dashed border-slate-700 rounded-xl p-10 text-center max-w-md">
-                      <div className="text-6xl mb-4">🕸️</div>
+                    <div className="border border-dashed border-[#e0f2fe] bg-[#f0f9ff]/50 rounded-2xl p-10 text-center max-w-md">
+                      <div className="text-6xl mb-4 select-none">🕸️</div>
 
-                      <h3 className="text-lg font-semibold">
+                      <h3 className="text-lg font-bold text-slate-700">
                         Todavía no hay grafo
                       </h3>
 
-                      <p className="text-slate-400 mt-2">
+                      <p className="text-slate-400 text-xs mt-2">
                         Genera un grafo a partir de las transcripciones del proyecto.
                       </p>
                     </div>
@@ -426,12 +433,17 @@ async function cargarUltimoGrafo() {
                       setNodoSeleccionado(data.nodo);
                     }}
                   >
-                    <Background />
+                    <Background color="#0284c7" opacity={0.08} />
                     <Controls />
                     <MiniMap
                       nodeColor={(node) => {
                         const data = node.data as { nodo?: NodoGrafo };
-                        return data.nodo ? tipoColor[data.nodo.tipo] : "#64748b";
+                        return data.nodo ? tipoColor[data.nodo.tipo] : "#94a3b8";
+                      }}
+                      style={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e0f2fe",
+                        borderRadius: "12px",
                       }}
                     />
                   </ReactFlow>
@@ -440,49 +452,50 @@ async function cargarUltimoGrafo() {
             </div>
           </main>
 
+          {/* Panel Lateral Derecho */}
           <aside className="xl:col-span-1 space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg min-h-[240px]">
-              <h2 className="text-lg font-semibold mb-4">
+            <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50 min-h-[240px]">
+              <h2 className="text-lg font-bold text-slate-800 mb-4">
                 Detalle del nodo
               </h2>
 
               {!nodoSeleccionado ? (
-                <p className="text-sm text-slate-400">
+                <p className="text-xs text-slate-400 font-semibold leading-relaxed">
                   Selecciona un nodo del grafo para ver su explicación, importancia y audio de origen.
                 </p>
               ) : (
                 <div>
                   <span
-                    className={`inline-block border rounded-full px-3 py-1 text-xs font-semibold ${tipoClase[nodoSeleccionado.tipo]}`}
+                    className={`inline-block border rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${tipoClase[nodoSeleccionado.tipo]}`}
                   >
                     {nodoSeleccionado.tipo}
                   </span>
 
-                  <h3 className="text-xl font-bold mt-4">
+                  <h3 className="text-xl font-extrabold text-slate-800 mt-4 leading-tight">
                     {nodoSeleccionado.label}
                   </h3>
 
-                  <p className="text-sm text-slate-400 mt-3">
+                  <p className="text-xs text-slate-500 mt-3 leading-relaxed">
                     {nodoSeleccionado.descripcion || "Sin descripción"}
                   </p>
 
-                  <div className="mt-4 bg-slate-950 border border-slate-800 rounded-lg p-3">
-                    <p className="text-xs text-slate-500">
+                  <div className="mt-4 bg-[#f0f9ff] border border-[#e0f2fe] rounded-xl p-3">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase">
                       Importancia
                     </p>
 
-                    <p className="text-lg font-bold">
+                    <p className="text-lg font-bold text-slate-800">
                       {nodoSeleccionado.importancia}/5
                     </p>
                   </div>
 
                   {nodoSeleccionado.audio_origen && (
-                    <div className="mt-3 bg-slate-950 border border-slate-800 rounded-lg p-3">
-                      <p className="text-xs text-slate-500">
+                    <div className="mt-3 bg-[#f0f9ff] border border-[#e0f2fe] rounded-xl p-3">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase">
                         Audio origen
                       </p>
 
-                      <p className="text-sm">
+                      <p className="text-xs text-slate-700 font-medium truncate mt-1">
                         {nodoSeleccionado.audio_origen}
                       </p>
                     </div>
@@ -493,48 +506,48 @@ async function cargarUltimoGrafo() {
 
             {grafo && (
               <>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                  <h2 className="text-lg font-semibold mb-4">
+                <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50">
+                  <h2 className="text-lg font-bold text-slate-800 mb-4">
                     Insights
                   </h2>
 
                   {grafo.contenido.insights && grafo.contenido.insights.length > 0 ? (
-                    <ul className="space-y-3 text-sm text-slate-300">
+                    <ul className="space-y-3 text-xs">
                       {grafo.contenido.insights.map((item, index) => (
                         <li
                           key={index}
-                          className="bg-slate-950 border border-slate-800 rounded-lg p-3"
+                          className="bg-[#f0f9ff] border border-[#e0f2fe] text-slate-700 rounded-xl p-3 leading-relaxed"
                         >
                           {item}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-slate-400">
+                    <p className="text-xs text-slate-400 font-semibold">
                       Sin insights detectados.
                     </p>
                   )}
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                  <h2 className="text-lg font-semibold mb-4">
+                <div className="bg-white border border-[#e0f2fe] rounded-2xl p-5 shadow-xl shadow-sky-100/50">
+                  <h2 className="text-lg font-bold text-slate-800 mb-4">
                     Recomendaciones
                   </h2>
 
                   {grafo.contenido.recomendaciones &&
                   grafo.contenido.recomendaciones.length > 0 ? (
-                    <ul className="space-y-3 text-sm text-slate-300">
+                    <ul className="space-y-3 text-xs">
                       {grafo.contenido.recomendaciones.map((item, index) => (
                         <li
                           key={index}
-                          className="bg-slate-950 border border-slate-800 rounded-lg p-3"
+                          className="bg-[#f0f9ff] border border-[#e0f2fe] text-slate-700 rounded-xl p-3 leading-relaxed"
                         >
                           {item}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-slate-400">
+                    <p className="text-xs text-slate-400 font-semibold">
                       Sin recomendaciones detectadas.
                     </p>
                   )}
