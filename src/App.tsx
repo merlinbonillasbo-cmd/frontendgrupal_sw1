@@ -14,6 +14,8 @@ import Quizzes from "./pages/Quizzes";
 import Presentaciones from "./pages/Presentaciones";
 import PDFs from "./pages/PDFs";
 import ResumenesGlobales from "./pages/ResumenesGlobales";
+import MiSuscripcion from "./pages/MiSuscripcion";
+import AdminPanel from "./pages/AdminPanel";
 
 
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/presentaciones" element={<Presentaciones />} />
           <Route path="/pdfs" element={<PDFs />} />
           <Route path="/resumenes" element={<ResumenesGlobales />} />
+          <Route path="/suscripcion" element={<MiSuscripcion />} />
+          <Route path="/admin" element={<AdminPanel />} />
         </Route>
 
 

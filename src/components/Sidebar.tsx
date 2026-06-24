@@ -4,6 +4,11 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Leer el rol desde localStorage para mostrar enlace admin
+  const usuarioGuardado = localStorage.getItem("usuario");
+  const rolUsuario = usuarioGuardado ? JSON.parse(usuarioGuardado).rol : "USUARIO";
+  const esAdmin = rolUsuario === "ADMIN";
+
   const cerrarSesion = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
@@ -78,6 +83,22 @@ export default function Sidebar() {
           >
             📝 Resúmenes
           </Link>
+
+          <Link
+            to="/suscripcion"
+            className={`flex items-center px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${linkActivo("/suscripcion")}`}
+          >
+            💳 Mi Suscripción
+          </Link>
+
+          {esAdmin && (
+            <Link
+              to="/admin"
+              className={`flex items-center px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${linkActivo("/admin")}`}
+            >
+              🛡️ Administración
+            </Link>
+          )}
         </nav>
       </div>
 
