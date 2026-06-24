@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import loginImg from "../../../img/login.jpeg";
+import loginImg from "../assets/perfil.avif";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
